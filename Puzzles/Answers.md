@@ -6,3 +6,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 71471
 **Answer 2:** 211189
 
+### 02 - Rock Paper Scissors
+[Description](https://adventofcode.com/2022/day/2)
+[Input](input02.txt)
+**Answer 1:** 10718
+**Answer 2:** 14652
+
