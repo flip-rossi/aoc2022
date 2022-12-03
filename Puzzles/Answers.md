@@ -12,3 +12,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 10718
 **Answer 2:** 14652
 
+### 03 - Rucksack Reorganization
+[Description](https://adventofcode.com/2022/day/3)
+[Input](input03.txt)
+**Answer 1:** 8298
+**Answer 2:** 
+
