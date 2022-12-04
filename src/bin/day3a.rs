@@ -1,4 +1,3 @@
-extern crate aoc22;
 use aoc22::line_reader::LineReader;
 
 fn get_letter_priority(ascii_letter: u8) -> usize {

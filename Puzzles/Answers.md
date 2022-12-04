@@ -16,5 +16,11 @@ The answers for my puzzle inputs.
 [Description](https://adventofcode.com/2022/day/3)
 [Input](input03.txt)
 **Answer 1:** 8298
-**Answer 2:** 
+**Answer 2:** 2708
+
+### 04 - Camp Cleanup
+[Description](https://adventofcode.com/2022/day/4)
+[Input](input04.txt)
+**Answer 1:** 547
+**Answer 2:** 843
 
