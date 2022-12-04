@@ -1,5 +1,15 @@
 use std::io::{self, stdin};
 
+macro_rules! pow {
+    ($a:expr, $b: expr) => {{
+        let mut ans = 1;
+        for _ in 0..$b {
+            ans *= $a;
+        }
+        ans
+    }};
+}
+
 pub struct LineReader {
     pub line: String, //Last line read as String
     pub count: usize, //Number of lines read
@@ -41,4 +51,29 @@ impl LineReader {
 
         words
     }
+
+    pub fn as_numbers(&self) -> Vec<u32> {
+        let mut numbers = Vec::new();
+
+        let chars: Vec<char> = self.line.chars().collect();
+        for i in (0..chars.len()).rev() {
+            let mut num: Option<u32> = None;
+            let mut order = 0;
+
+            while let Some(d) = chars[i].to_digit(10) {
+                num = match num {
+                    Some(n) => Some(n + d*pow!(10,order)),
+                    None => Some(d),
+                };
+                order += 1;
+            }
+
+            if let Some(n) = num {
+                numbers.insert(0, n);
+            }
+        }
+
+        numbers
+    }
 }
+
