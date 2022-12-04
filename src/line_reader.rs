@@ -52,7 +52,7 @@ impl LineReader {
         words
     }
 
-    pub fn as_numbers(&self) -> Vec<u32> {
+    pub fn as_numbers(&self, radix: u32) -> Vec<u32> {
         let mut numbers = Vec::new();
 
         let chars: Vec<char> = self.line.chars().collect();
@@ -65,7 +65,7 @@ impl LineReader {
 
             while let Some(d) = chars[i].to_digit(10) {
                 num = match num {
-                    Some(n) => Some(n + d*pow!(10,order)),
+                    Some(n) => Some(n + d*pow!(radix, order)),
                     None => Some(d),
                 };
                 order += 1;
