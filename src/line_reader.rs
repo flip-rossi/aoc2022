@@ -13,6 +13,10 @@ impl LineReader {
         }
     }
 
+    /**
+    Reads the next line from stdin, saving it to self's `line` field.  
+    Returns the amount of bytes read, or 0 for EOF.
+    */
     pub fn read_next(&mut self) -> io::Result<usize> {
         self.line.clear();
         let nbytes = stdin().read_line(&mut self.line)?;
@@ -24,6 +28,10 @@ impl LineReader {
         Ok(nbytes)
     }
 
+    /**
+    Parses the `line` value as a Vec of words, where a word is
+    any sequence of characters separated by a single space.
+    */
     pub fn as_words(&self) -> Vec<String> {
         let mut words = Vec::new();
         let mut w = String::new();
@@ -42,6 +50,10 @@ impl LineReader {
         words
     }
 
+    /**
+    Parses the `line` value as a Vec of unsigned numbers,
+    ignoring any character that's not a digit
+    */
     pub fn as_numbers(&self, radix: u32) -> Vec<u32> {
         let mut numbers = Vec::new();
 

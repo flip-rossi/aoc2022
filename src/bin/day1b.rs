@@ -1,3 +1,5 @@
+//! Day 1 part 2 - Calorie Counting
+
 use aoc22::line_reader::LineReader;
 
 fn main() {

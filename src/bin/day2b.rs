@@ -1,3 +1,5 @@
+//! Day 2 part 2 - Rock Paper Scissors
+
 use aoc22::line_reader::LineReader;
 
 enum Choice {

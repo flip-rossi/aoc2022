@@ -1,3 +1,5 @@
+//! Day 3 part 1 - Rucksack Reorganization
+
 use aoc22::line_reader::LineReader;
 
 fn get_letter_priority(ascii_letter: u8) -> usize {

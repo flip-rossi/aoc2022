@@ -1,3 +1,5 @@
+//! Day 4 part 1 - Camp Cleanup
+
 use aoc22::line_reader::LineReader;
 
 fn main() {
