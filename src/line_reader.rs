@@ -1,15 +1,5 @@
 use std::io::{self, stdin};
 
-macro_rules! pow {
-    ($a:expr, $b: expr) => {{
-        let mut ans = 1;
-        for _ in 0..$b {
-            ans *= $a;
-        }
-        ans
-    }};
-}
-
 pub struct LineReader {
     pub line: String, //Last line read as String
     pub count: usize, //Number of lines read
@@ -65,7 +55,7 @@ impl LineReader {
 
             while let Some(d) = chars[i].to_digit(10) {
                 num = match num {
-                    Some(n) => Some(n + d*pow!(radix, order)),
+                    Some(n) => Some(n + d*(radix^order)),
                     None => Some(d),
                 };
                 order += 1;
