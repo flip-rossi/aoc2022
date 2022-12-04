@@ -7,7 +7,9 @@ fn main() {
     let mut answer = 0;
 
     while lr.read_next().unwrap() > 0 {
-        let numbers = lr.as_numbers(10);
+        let numbers = lr.line.split(|c| c == ',' || c == '-')
+            .map(|s| s.parse::<i32>().unwrap())
+            .collect::<Vec<i32>>();
         if numbers[0] <= numbers[3] && numbers[2] <= numbers[1] {
             answer += 1;
         }
