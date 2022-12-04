@@ -56,7 +56,10 @@ impl LineReader {
         let mut numbers = Vec::new();
 
         let chars: Vec<char> = self.line.chars().collect();
-        for i in (0..chars.len()).rev() {
+        let mut i = chars.len();
+        while i > 0 {
+            i -= 1;
+            
             let mut num: Option<u32> = None;
             let mut order = 0;
 
@@ -66,6 +69,8 @@ impl LineReader {
                     None => Some(d),
                 };
                 order += 1;
+                if i == 0 { break; }
+                i -= 1;
             }
 
             if let Some(n) = num {
