@@ -51,16 +51,18 @@ curl --silent --show-error --cookie session=${SESSION_TOKEN} -X POST \
 if grep "too recently" ${tmp_file} >/dev/null; then
     cooldown=$( grep "You have" ${tmp_file} | \
         sed -E "s/.*You have (([0-9]+m )?[0-9]+s).*/\1/" )
-    echo "Try again in ${cooldown}"
+    echo "Try again in ${cooldown}..."
 elif grep "That's not the right answer" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is wrong!"
 elif grep "too high" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is too high!"
 elif grep "too low" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is too low!"
+elif grep "That's the right answer" ${tmp_file} >/dev/null; then
+    echo "That's the right answer! Part ${part} done."
 else
-    echo "TODO get 'right answer' grep pattern"
-#else
-#   echo "Something went wrong"
+    echo "Unexpected server response:"
+    cat $tmp_file
+    exit 3
 fi
 
