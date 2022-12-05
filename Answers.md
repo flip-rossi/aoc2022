@@ -24,3 +24,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 547  
 **Answer 2:** 843  
 
+### 05 - Supply Stacks
+[Description](https://adventofcode.com/2022/day/5)  
+[Input](Inputs/input05.txt)  
+**Answer 1:** VPCDMSLWJ  
+**Answer 2:** TPWCGNCCG  
+

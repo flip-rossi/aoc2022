@@ -1,4 +1,4 @@
-//! Day 5 part 1 - Supply Stacks
+//! Day 5 part 2 - Supply Stacks
 
 use aoc22::line_reader::LineReader;
 
@@ -42,11 +42,9 @@ fn main() {
     // Execute commands
     while lr.read_next().unwrap() > 0 {
         let nums = lr.as_numbers(10); //array of len 3 where [amount, src, dest]
-        for _ in 0..nums[0] {
-            if let Some(moved) = stacks[nums[1]-1].pop() {
-                stacks[nums[2]-1].push(moved);
-            }
-        }
+        let split_i = stacks[nums[1]-1].len() - nums[0];
+        let mut moved = stacks[nums[1]-1].split_off(split_i);
+        stacks[nums[2]-1].append(&mut moved);
     }
 
     // Get answer

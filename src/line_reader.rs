@@ -54,7 +54,7 @@ impl LineReader {
     Parses the `line` value as a Vec of unsigned numbers,
     ignoring any character that's not a digit
     */
-    pub fn as_numbers(&self, radix: u32) -> Vec<u32> {
+    pub fn as_numbers(&self, radix: usize) -> Vec<usize> {
         let mut numbers = Vec::new();
 
         let chars: Vec<char> = self.line.chars().collect();
@@ -62,13 +62,13 @@ impl LineReader {
         while i > 0 {
             i -= 1;
             
-            let mut num: Option<u32> = None;
+            let mut num: Option<usize> = None;
             let mut order = 0;
 
             while let Some(d) = chars[i].to_digit(10) {
                 num = match num {
-                    Some(n) => Some( n + d*radix.pow(order) ),
-                    None => Some(d),
+                    Some(n) => Some( n + (d as usize)*radix.pow(order) ),
+                    None => Some(d as usize),
                 };
                 order += 1;
                 if i == 0 { break; }
