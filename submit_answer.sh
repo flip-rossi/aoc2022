@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 # Cleanup temp file
 cleanup () {
   trap - EXIT
-  if [ -e "$tmpfile" ] ; then rm -rf "$tmpfile"; fi
+  if [ -e "$tmp_file" ] ; then rm -rf "$tmp_file"; fi
 }
 trap 'cleanup' EXIT
 trap 'cleanup HUP' HUP
@@ -17,33 +17,50 @@ if [ -z $SESSION_TOKEN ]; then
     exit 1
 fi
 
-# Read inputs and set day
-day=$(( $(date +%d) ))
-part=$(($1))
+# Read arguments
+if [[ $1 =~ ^[0-9]+-[0-9]+$ ]]; then #if $1 is in format `<number>-<number>`
+    day=$(echo $1 | sed -E "s/([0-9]+)-[0-9]+/\1/")
+    part=$(echo $1 | sed -E "s/[0-9]+-([0-9]+)/\1/")
+else
+    day=$(( $(date +%d) ))
+    part=$1
+fi
 answer=$2
 
-if [ -z $part ] || [ -z $answer ]; then
-    echo "Usage: ${0} PART ANSWER"
+if [[ ! $1 =~ ^([0-9]+-)?[0-9]+$ ]] || [ -z $answer ]; then
+    echo "Usage: ${0} [DAY-]PART ANSWER"
     exit 2
-elif [[ $part != 1 ]] && [[ $parr != 2 ]]; then
+elif [[ $part != 1 ]] && [[ $part != 2 ]]; then
     echo "PART must be 1 or 2"
     exit 2
+elif [ $day -lt 1 ] || [ $day -gt 25 ]; then
+    echo "Day must be in the 1-25 range"
+    exit 2
 fi
-
-url="https://adventofcode.com/2022/day/${day}/answer"
 
 # Do the stuff
 tmp_file=$(mktemp -t aoc_ans.XXXXX)
 
-curl -b session=${SESSION_TOKEN} -X POST -H "Content-Type: application/x-www-form-urlencoded" --data "level=${part}&answer=${answer}" ${url} > $tmp_file
+url="https://adventofcode.com/2022/day/${day}/answer"
+echo -e "Sending ${day}-${part} answer ${answer} to ${url}...\n"
 
-if grep "That's not the right answer" ${tmpfile}; then
+curl --silent --show-error --cookie session=${SESSION_TOKEN} -X POST \
+    -H "Content-Type: application/x-www-form-urlencoded" --data "level=${part}&answer=${answer}" \
+    ${url} > $tmp_file
+
+if grep "too recently" ${tmp_file} >/dev/null; then
+    cooldown=$( grep "You have" ${tmp_file} | \
+        sed -E "s/.*You have (([0-9]+m )?[0-9]+s).*/\1/" )
+    echo "Try again in ${cooldown}"
+elif grep "That's not the right answer" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is wrong!"
-elif grep "too high" ${tmp_file}; then
+elif grep "too high" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is too high!"
-elif grep "too low" ${tmp_file}; then
+elif grep "too low" ${tmp_file} >/dev/null; then
     echo "The answer (${answer}) is too low!"
 else
     echo "TODO get 'right answer' grep pattern"
+#else
+#   echo "Something went wrong"
 fi
 
