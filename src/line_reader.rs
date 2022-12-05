@@ -67,7 +67,7 @@ impl LineReader {
 
             while let Some(d) = chars[i].to_digit(10) {
                 num = match num {
-                    Some(n) => Some(n + d*(radix^order)),
+                    Some(n) => Some( n + d*radix.pow(order) ),
                     None => Some(d),
                 };
                 order += 1;
