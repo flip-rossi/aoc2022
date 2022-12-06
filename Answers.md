@@ -34,5 +34,5 @@ The answers for my puzzle inputs.
 [Description](https://adventofcode.com/2022/day/6)  
 [Input](Inputs/input06.txt)  
 **Answer 1:** 1892  
-**Answer 2:**   
+**Answer 2:** 2313  
 
