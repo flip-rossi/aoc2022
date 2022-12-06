@@ -17,10 +17,19 @@ if [ -z $SESSION_TOKEN ]; then
     exit 1
 fi
 
+# Options
+VERBOSE=0
+while getopts "v" OPTION; do
+    case $OPTION in
+        v) VERBOSE=1 ;;
+    esac
+done
+shift $(($OPTIND - 1))
+
 # Read arguments
 if [[ $1 =~ ^[0-9]+-[0-9]+$ ]]; then #if $1 is in format `<number>-<number>`
-    day=$(echo $1 | sed -E "s/([0-9]+)-[0-9]+/\1/")
-    part=$(echo $1 | sed -E "s/[0-9]+-([0-9]+)/\1/")
+    day=$(sed -E "s/([0-9]+)-[0-9]+/\1/" <<< $1)
+    part=$(sed -E "s/[0-9]+-([0-9]+)/\1/" <<< $1)
 else
     day=$(( $(date +%d) ))
     part=$1
@@ -44,22 +53,46 @@ tmp_file=$(mktemp -t aoc_ans.XXXXX)
 url="https://adventofcode.com/2022/day/${day}/answer"
 echo -e "Sending ${day}-${part} answer ${answer} to ${url}...\n"
 
-curl --silent --show-error --cookie session=${SESSION_TOKEN} -X POST \
+curl_opts="--show-error"
+if [ $VERBOSE -eq 0 ]; then
+    curl_opts="${curl_opts} --silent"
+fi
+
+curl ${curl_opts} --cookie session=${SESSION_TOKEN} -X POST \
     -H "Content-Type: application/x-www-form-urlencoded" --data "level=${part}&answer=${answer}" \
     ${url} > $tmp_file
 
-if grep "too recently" ${tmp_file} >/dev/null; then
+if [ $VERBOSE -eq 1 ]; then
+    line_no=$(grep -n 'main' ${tmp_file} | \
+                sed -E "s/^([0-9]+).*$/\1/")
+    tail -n +${line_no} ${tmp_file}
+    echo
+fi
+
+# too many recent tries
+if grep "too recently" ${tmp_file}>/dev/null; then
     cooldown=$( grep "You have" ${tmp_file} | \
         sed -E "s/.*You have (([0-9]+m )?[0-9]+s).*/\1/" )
     echo "Try again in ${cooldown}..."
-elif grep "That's not the right answer" ${tmp_file} >/dev/null; then
+# wrong answer
+elif grep "That's not the right answer" ${tmp_file}>/dev/null; then
     echo "The answer (${answer}) is wrong!"
-elif grep "too high" ${tmp_file} >/dev/null; then
+# answer is too high
+elif grep "too high" ${tmp_file}>/dev/null; then
     echo "The answer (${answer}) is too high!"
-elif grep "too low" ${tmp_file} >/dev/null; then
+# answer is too low
+elif grep "too low" ${tmp_file}>/dev/null; then
     echo "The answer (${answer}) is too low!"
-elif grep "That's the right answer" ${tmp_file} >/dev/null; then
+# right answer
+elif grep "That's the right answer" ${tmp_file}>/dev/null; then
     echo "That's the right answer! Part ${part} done."
+# puzzle already completed
+elif grep "Did you already complete it" ${tmp_file}>/dev/null; then
+    echo "Puzzle already completed."
+# day not available yet
+elif grep "the instant this puzzle becomes available" ${tmp_file}>/dev/null; then
+    echo "Puzzle not available yet."
+# uuuuh
 else
     echo "Unexpected server response:"
     cat $tmp_file

@@ -30,3 +30,9 @@ The answers for my puzzle inputs.
 **Answer 1:** VPCDMSLWJ  
 **Answer 2:** TPWCGNCCG  
 
+### Day 6: Tuning Trouble
+[Description](https://adventofcode.com/2022/day/6)  
+[Input](Inputs/input06.txt)  
+**Answer 1:** 1892  
+**Answer 2:**   
+
