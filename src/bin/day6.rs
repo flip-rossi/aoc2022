@@ -1,41 +1,19 @@
-//! Day 6 part 1 - Tuning Trouble
+//! Day 6 parts 1 and 2 - Tuning Trouble
 
 use std::process::exit;
+
+use aoc22::circ_array::CircArray;
 
 const SOP_LENGTH: usize = 4;
 const SOM_LENGTH: usize = 14;
 
-struct CircArray<'a, T> {
-    arr: &'a mut Vec<Option<T>>,
-    tail: usize,
-}
-
-impl<'a, T> CircArray<'a, T> where T: Eq {
-    fn new(arr: &'a mut Vec<Option<T>>) -> Self {
-        CircArray { arr, tail: 0 }
-    }
-
-    fn push(&mut self, val: T) {
-        self.arr[self.tail] = Some(val);
-        self.tail = (self.tail+1) % self.arr.len();
-    }
-
-    //this could be way better but I already spent too much time learning generic lifetimes
-    fn has_duplicates(&self) -> bool {
-        for i in 0..self.arr.len()-1 {
-            for j in i+1..self.arr.len() {
-                if self.arr[i] == self.arr[j] { return true }
-            }
-        }
-        false
-    }
-}
-
 fn main() {
+    // Read commandline argument for which part of the puzzle to solve
     let target = match std::env::args().nth(1) {
         Some(s) => {
             match usize::from_str_radix(&s, 10).expect("Part must be a number.") {
-                1 => SOP_LENGTH, 2 => SOM_LENGTH,
+                1 => SOP_LENGTH,
+                2 => SOM_LENGTH,
                 _ => {
                     eprintln!("Part must be 1 or 2.");
                     exit(1)
@@ -48,24 +26,23 @@ fn main() {
         }
     };
 
+    // Read the line from stdin
     let mut buf = String::new();
     std::io::stdin().read_line(&mut buf).unwrap();
     let line = buf.as_bytes();
 
-    let mut ans = None;
-
-    let mut recent_array = vec![None; target];
-    let mut circ = CircArray::new(&mut recent_array);
-    
-    //read first 4 elements
+    // Initialize circular array
+    let mut circ = CircArray::new(target);
     let mut i = 0;
     while i < target {
-        circ.push(line[i]);
+        circ.add_last(line[i]);
         i+=1
     }
 
+    let mut ans = None;
+
     while i < line.len() {
-        circ.push(line[i]);
+        circ.add_last(line[i]);
         i+=1;
         if !circ.has_duplicates() {
             ans = Some(i);
