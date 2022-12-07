@@ -36,3 +36,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 1892  
 **Answer 2:** 2313  
 
+### Day 7: No Space Left On Device
+[Description](https://adventofcode.com/2022/day/7)  
+[Input](Inputs/input07.txt)  
+**Answer 1:** 1844187  
+**Answer 2:** 24978279  
+
