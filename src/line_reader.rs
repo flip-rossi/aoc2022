@@ -3,6 +3,7 @@ use std::io::{self, stdin};
 pub struct LineReader {
     pub line: String, //Last line read as String
     pub count: usize, //Number of lines read
+    pub stunned: bool,
 }
 
 impl LineReader {
@@ -10,6 +11,7 @@ impl LineReader {
         LineReader {
             line: String::new(),
             count: 0,
+            stunned: false,
         }
     }
 
@@ -18,6 +20,11 @@ impl LineReader {
     Returns the amount of bytes read, or 0 for EOF.
     */
     pub fn read_next(&mut self) -> io::Result<usize> {
+        if self.stunned {
+            self.stunned = false;
+            return Ok( self.line.len() )
+        }
+
         self.line.clear();
         let nbytes = stdin().read_line(&mut self.line)?;
         if nbytes > 0 {
