@@ -42,3 +42,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 1844187  
 **Answer 2:** 24978279  
 
+### Day 8: Treetop Tree House
+[Description](https://adventofcode.com/2022/day/8)  
+[Input](Inputs/input08.txt)  
+**Answer 1:** 1543  
+**Answer 2:**   
+
