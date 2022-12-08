@@ -31,7 +31,7 @@ if [[ $1 =~ ^[0-9]+-[0-9]+$ ]]; then #if $1 is in format `<number>-<number>`
     day=$(sed -E "s/([0-9]+)-[0-9]+/\1/" <<< $1)
     part=$(sed -E "s/[0-9]+-([0-9]+)/\1/" <<< $1)
 else
-    day=$(( $(date +%d) ))
+    day=$(( 10#$(date +%d) ))
     part=$1
 fi
 answer=$2
