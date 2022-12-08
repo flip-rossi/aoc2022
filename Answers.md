@@ -46,5 +46,5 @@ The answers for my puzzle inputs.
 [Description](https://adventofcode.com/2022/day/8)  
 [Input](Inputs/input08.txt)  
 **Answer 1:** 1543  
-**Answer 2:**   
+**Answer 2:** 595080  
 
