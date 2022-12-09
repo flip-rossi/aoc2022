@@ -1,6 +1,6 @@
 //! Day 9: Rope Bridge
 
-use std::collections::HashSet;
+use std::{collections::HashSet, ops::{Add, Sub, AddAssign}};
 
 use aoc22::solve_puzzle;
 
@@ -9,13 +9,54 @@ const RIGHT: (i32,i32) = ( 1, 0);
 const UP:    (i32,i32) = ( 0, 1);
 const DOWN:  (i32,i32) = ( 0,-1);
 
+const ORIGIN: Pos = Pos { x: 0, y: 0 };
+
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
+struct Pos { x: i32, y: i32 }
+impl Pos {
+    fn unit(&self) -> Self {
+        Self {
+            x: self.x.signum(),
+            y: self.y.signum(),
+        }
+    }
+}
+impl Add for Pos {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+impl AddAssign for Pos {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = self.add(rhs);
+    }
+}
+impl Sub for Pos {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
 struct Motion {
-    dir: (i32, i32),
+    dir: Pos,
     amount: i32,
 }
 impl Motion {
     fn new(dir: (i32, i32), amount: i32) -> Self {
-        Self { dir, amount }
+        Self {
+            dir: Pos { x: dir.0, y: dir.1 },
+            amount,
+        }
     }
 }
 
@@ -41,17 +82,17 @@ fn main() {
 
 //=============== PART 1 ===============//
 fn part1(motions: Vec<Motion>) -> usize {
-    let mut tail = (0,0);
-    let mut head = (0,0);
+    let mut tail = ORIGIN;
+    let mut head = ORIGIN;
 
-    let mut tail_positions: HashSet<(i32, i32)> = HashSet::new();
+    let mut tail_positions: HashSet<Pos> = HashSet::new();
     tail_positions.insert(tail);
     for m in motions {
         for _ in 0..m.amount {
-            head.0 += m.dir.0; head.1 += m.dir.1;
-            let dist = (head.0 - tail.0, head.1 - tail.1);
-            if dist.0.abs() >= 2 || dist.1.abs() >= 2 {
-                tail.0 += dist.0.signum(); tail.1 += dist.1.signum();
+            head += m.dir;
+            let diff = head - tail;
+            if diff.x.abs() >= 2 || diff.y.abs() >= 2 {
+                tail += diff.unit();
                 tail_positions.insert(tail);
             }
         }
@@ -64,17 +105,17 @@ fn part1(motions: Vec<Motion>) -> usize {
 const KNOTS_N: usize = 10;
 
 fn part2(motions: Vec<Motion>) -> usize {
-    let mut knots = [(0,0); KNOTS_N];
+    let mut knots = [Pos { x: 0, y: 0 }; KNOTS_N];
 
     let mut tail_positions = HashSet::new();
     tail_positions.insert(knots[KNOTS_N-1]);
     for m in motions {
         for _ in 0..m.amount {
-            knots[0].0 += m.dir.0; knots[0].1 += m.dir.1;
+            knots[0] += m.dir;
             for i in 1..knots.len() {
-                let dist = (knots[i-1].0 - knots[i].0, knots[i-1].1 - knots[i].1);
-                if dist.0.abs() >= 2 || dist.1.abs() >= 2 {
-                    knots[i].0 += dist.0.signum(); knots[i].1 += dist.1.signum();
+                let diff = knots[i-1] - knots[i];
+                if diff.x.abs() >= 2 || diff.y.abs() >= 2 {
+                    knots[i] += diff.unit();
                 }
             }
             tail_positions.insert(knots[KNOTS_N-1]);
