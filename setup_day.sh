@@ -23,7 +23,7 @@ echo "Creating new file ${new_file} from template..."
 if [ ! -e $new_file ]; then
     cp "$(dirname $0)/template.rs" ${new_file}
     sed -i -E "s/#(.*)\{Title\}/${day}\1${title}/" ${new_file}
-    echo -e "### Day ${day}: ${title}\n[Description](${url})  \n[Input](inputs/input${day_padded}.txt)  \n**Answer 1:**   \n**Answer 2:**   \n" >> \
+    echo -e "### Day ${day}: ${title}\n[[Description]](${url}) [[Input]](inputs/input${day_padded}.txt)  \n**Answer 1:**   \n**Answer 2:**   \n" >> \
         $(dirname $0)/Answers.md
 else
     echo "${new_file} already exists."
