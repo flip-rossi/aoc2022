@@ -53,9 +53,8 @@ fn part2() -> i32 {
 */
 #[macro_export]
 macro_rules! solve_puzzle {
-    ($part:expr$(, $puzzle_args:expr)*) => {
-        let mut args = std::env::args();
-        match args.nth(1) {
+    ($($puzzle_args:expr),*) => {
+        match std::env::args().nth(1) {
             Some(s) => {
                 match u8::from_str_radix(&s, 10) {
                     Ok(1) => part1($($puzzle_args),*),
@@ -63,7 +62,7 @@ macro_rules! solve_puzzle {
                     _ => $crate::exit_msg!(1, "Usage: Part must be 1 or 2"),
                 }
             },
-            None => $crate::exit_msg!(1, "Usage: {} PART", args.nth(0)),
+            None => $crate::exit_msg!(1, "Usage: {} PART", std::env::args().nth(0).unwrap()),
         }
     };
 }
