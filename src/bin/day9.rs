@@ -1,8 +1,9 @@
 //! Day 9: Rope Bridge
 
-use std::{collections::HashSet, ops::{Add, Sub, AddAssign}};
+use std::collections::HashSet;
 
 use aoc22::solve_puzzle;
+use aoc22::position::Pos;
 
 const LEFT:  (i32,i32) = (-1, 0);
 const RIGHT: (i32,i32) = ( 1, 0);
@@ -10,42 +11,6 @@ const UP:    (i32,i32) = ( 0, 1);
 const DOWN:  (i32,i32) = ( 0,-1);
 
 const ORIGIN: Pos = Pos { x: 0, y: 0 };
-
-#[derive(Clone, Copy, Hash, PartialEq, Eq)]
-struct Pos { x: i32, y: i32 }
-impl Pos {
-    fn unit(&self) -> Self {
-        Self {
-            x: self.x.signum(),
-            y: self.y.signum(),
-        }
-    }
-}
-impl Add for Pos {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-impl AddAssign for Pos {
-    fn add_assign(&mut self, rhs: Self) {
-        *self = self.add(rhs);
-    }
-}
-impl Sub for Pos {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
-    }
-}
 
 struct Motion {
     dir: Pos,
@@ -92,7 +57,7 @@ fn part1(motions: Vec<Motion>) -> usize {
             head += m.dir;
             let diff = head - tail;
             if diff.x.abs() >= 2 || diff.y.abs() >= 2 {
-                tail += diff.unit();
+                tail += diff.sign();
                 tail_positions.insert(tail);
             }
         }
@@ -115,7 +80,7 @@ fn part2(motions: Vec<Motion>) -> usize {
             for i in 1..knots.len() {
                 let diff = knots[i-1] - knots[i];
                 if diff.x.abs() >= 2 || diff.y.abs() >= 2 {
-                    knots[i] += diff.unit();
+                    knots[i] += diff.sign();
                 }
             }
             tail_positions.insert(knots[KNOTS_N-1]);
