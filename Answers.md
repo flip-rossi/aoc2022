@@ -48,3 +48,9 @@ The answers for my puzzle inputs.
 **Answer 1:** 1543  
 **Answer 2:** 595080  
 
+### Day 9: Rope Bridge
+[Description](https://adventofcode.com/2022/day/9)  
+[Input](inputs/input09.txt)  
+**Answer 1:**   
+**Answer 2:**   
+
