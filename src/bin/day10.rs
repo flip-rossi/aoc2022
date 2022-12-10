@@ -44,14 +44,12 @@ fn main() -> Result<(),std::io::Error> {
     }
 
     // Solve
-    let answer = solve_puzzle!(instructions);
-    println!("{answer}");
-
+    solve_puzzle!(instructions);
     Ok(())
 }
 
 //=============== PART 1 ===============//
-fn part1(instructions: Vec<Instruction>) -> i32 {
+fn part1(instructions: Vec<Instruction>) {
     let mut answer = 0;
 
     let mut x = 1;
@@ -75,12 +73,36 @@ fn part1(instructions: Vec<Instruction>) -> i32 {
 
     }
 
-    answer
+    println!("{answer}");
 }
 
 //=============== PART 2 ===============//
-#[allow(unused_variables)]
-fn part2(instructions: Vec<Instruction>) -> i32 {
-    todo!()
+fn part2(instructions: Vec<Instruction>) {
+    let mut line = String::with_capacity(CYCLE_INTERVAL as usize);
+
+    let mut x = 1;
+    let mut cycle = 0;
+    for instr in instructions {
+        for i in (0..instr.duration()).rev() {
+            cycle += 1;
+            if ((cycle-1)%CYCLE_INTERVAL - x).abs() <= 1 {
+                line.push('#');
+            }
+            else {
+                line.push('.');
+            }
+            if cycle%CYCLE_INTERVAL == 0 {
+                println!("{line}");
+                line.clear();
+            }
+
+            if i == 0 {
+                match instr {
+                    Noop => {},
+                    Addx(y) => x += y,
+                }
+            }
+        }
+    }
 }
 

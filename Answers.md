@@ -48,5 +48,5 @@ The answers for my puzzle inputs.
 ### Day 10: Cathode-Ray Tube
 [[Description]](https://adventofcode.com/2022/day/10) [[Input]](inputs/input10.txt)  
 **Answer 1:** 14920  
-**Answer 2:**   
+**Answer 2:** BUCACBUZ  
 
