@@ -14,8 +14,8 @@ curl -b session=${SESSION_TOKEN} "${url}/input" > $out && {
 }
 
 # Get day's title
-title=$(curl -s ${url} | grep -m 1 "<h2>--- Day" | sed -E "s/^.*<h2>--- Day [0-9]: (.*) ---<\/h2>.*$/\1/")
-echo $title
+title=$(curl -s ${url} | grep -m 1 "<h2>--- Day" | sed -E "s/^.*<h2>--- Day [0-9]{1,2}: (.*) ---<\/h2>.*$/\1/")
+echo "Day ${day}: ${title}"
 
 # Create source code file from template and add day to Answers.md
 new_file="$(dirname $0)/src/bin/day${day}.rs"
@@ -28,4 +28,6 @@ if [ ! -e $new_file ]; then
 else
     echo "${new_file} already exists."
 fi
+
+echo -e "\nSee the puzzle description at ${url}"
 
