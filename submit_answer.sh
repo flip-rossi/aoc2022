@@ -82,13 +82,15 @@ if grep "too recently" ${tmp_file}>/dev/null; then
     echo "Try again in ${cooldown}..."
 # wrong answer
 elif grep "That's not the right answer" ${tmp_file}>/dev/null; then
-    echo "The answer (${answer}) is wrong!"
-# answer is too high
-elif grep "too high" ${tmp_file}>/dev/null; then
-    echo "The answer (${answer}) is too high!"
-# answer is too low
-elif grep "too low" ${tmp_file}>/dev/null; then
-    echo "The answer (${answer}) is too low!"
+    # answer is too high
+    if grep "too high" ${tmp_file}>/dev/null; then
+        echo "The answer (${answer}) is too high!"
+    # answer is too low
+    elif grep "too low" ${tmp_file}>/dev/null; then
+        echo "The answer (${answer}) is too low!"
+    else
+        echo "The answer (${answer}) is wrong!"
+    fi
 # puzzle already completed
 elif grep "Did you already complete it" ${tmp_file}>/dev/null; then
     echo "Puzzle already completed."
