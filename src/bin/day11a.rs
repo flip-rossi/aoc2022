@@ -1,6 +1,6 @@
 //! Day 11: Monkey in the Middle
 
-use aoc22::{solve_puzzle, line_reader::LineReader};
+use aoc22::line_reader::LineReader;
 
 #[derive(Debug)]
 enum Operation {
@@ -75,7 +75,7 @@ fn main() {
     monkeys.push(monkey); // push last monkey
 
     // Solve
-    let answer = solve_puzzle!(monkeys);
+    let answer = part1(monkeys);
     println!("{answer}")
 }
 
@@ -84,10 +84,8 @@ const ROUNDS: i32 = 20;
 
 fn part1(mut monkeys: Vec<Monkey>) -> i32 {
     // Do the monkey business
-    for r in 0..ROUNDS {
-        eprintln!("ROUND {r}");
+    for _ in 0..ROUNDS {
         for i in 0..monkeys.len() {
-            eprintln!("Monkey {i}");
             let m = &mut monkeys[i];
             m.inspections += m.items.len() as i32;
 
@@ -131,11 +129,5 @@ fn part1(mut monkeys: Vec<Monkey>) -> i32 {
     }
 
     top2[0] * top2[1]
-}
-
-//=============== PART 2 ===============//
-#[allow(unused_variables)]
-fn part2(monkeys: Vec<Monkey>) -> i32 {
-    todo!()
 }
 

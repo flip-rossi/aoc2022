@@ -1,6 +1,6 @@
 //! Day 11: Monkey in the Middle
 
-use aoc22::{solve_puzzle, line_reader::LineReader};
+use aoc22::line_reader::LineReader;
 
 #[derive(Debug, Clone, Copy)]
 enum Operation {
@@ -105,19 +105,17 @@ fn main() {
             m.items_values.push(i % test_value);
         }
     }
-    eprintln!("Monkey 0: {:?}", monkeys[0]);
 
     // Solve
-    let answer = solve_puzzle!(monkeys);
+    let answer = part2(monkeys);
     println!("{answer}")
 }
 
 //=============== PART 2 ===============//
+const ROUNDS: i32 = 10_000;
 fn part2(mut monkeys: Vec<Monkey>) -> i64 {
     // Do the monkey business
-    for r in 0..10_000 {
-        eprintln!("ROUND {r}");
-        eprintln!("Monkey 0 items before round: {:?}", monkeys[0].items_held);
+    for _ in 0..ROUNDS {
         for monkey_index in 0..monkeys.len() {
             // Update items
             let m = &monkeys[monkey_index];
@@ -133,9 +131,7 @@ fn part2(mut monkeys: Vec<Monkey>) -> i64 {
             let mut m = &mut monkeys[monkey_index];
             //         Vec<(item_index, monkey_index)>
             let mut throws: Vec<(usize, usize)> = Vec::with_capacity(m.items_held.len());
-            eprintln!("Monkey's items held:");
             for &item in &m.items_held {
-                eprint!("{} ", item);
                 if m.items_values[item] == 0 {
                     throws.push((item, m.targets.0));
                 }
@@ -146,9 +142,7 @@ fn part2(mut monkeys: Vec<Monkey>) -> i64 {
             m.inspections += m.items_held.len() as i64;
             m.items_held.clear();
 
-            eprintln!("Monkey's items thrown:");
             for t in throws {
-                eprint!("{} ", t.0);
                 monkeys[t.1].items_held.push(t.0);
             }
         }
@@ -169,63 +163,5 @@ fn part2(mut monkeys: Vec<Monkey>) -> i64 {
     }
 
     top2[0] * top2[1]
-}
-
-//=============== PART 1 ===============//
-// const ROUNDS: i32 = 20;
-
-#[allow(unused_variables, unused_mut)]
-fn part1(mut monkeys: Vec<Monkey>) -> i64 {
-    /*
-    // Do the monkey business
-    for r in 0..ROUNDS {
-        eprintln!("ROUND {r}");
-        for i in 0..monkeys.len() {
-            eprintln!("Monkey {i}");
-            let m = &mut monkeys[i];
-            m.inspections += m.items.len() as i32;
-
-            let mut throws: Vec<(i64, usize)> = Vec::with_capacity(m.items.len());
-            for _ in 0..m.items.len() {
-
-                let mut item = m.items.pop().unwrap();
-                match m.operation {
-                    Operation::None => panic!("Invalid operation for monkey {i}: {m:?}"),
-                    Operation::Plus(n) => item = (item + n)/3,
-                    Operation::Times(n) => item = (item * n)/3,
-                    Operation::TimesOld => item = (item * item)/3,
-                }
-
-                if item % m.test_value == 0 {
-                    throws.push((item, m.targets.0));
-                }
-                else {
-                    throws.push((item, m.targets.1));
-                }
-            }
-
-            for t in throws {
-                monkeys[t.1].items.push(t.0);
-            }
-        }
-    }
-
-    // Get answer
-    let mut top2 = [0; 2];
-    for m in monkeys {
-        if m.inspections > top2[1] {
-            if m.inspections > top2[0] {
-                top2[1] = top2[0];
-                top2[0] = m.inspections;
-            }
-            else {
-                top2[1] = m.inspections;
-            }
-        }
-    }
-
-    top2[0] * top2[1]
-    */
-    todo!()
 }
 
