@@ -53,5 +53,5 @@ The answers for my puzzle inputs.
 ### Day 11: Monkey in the Middle
 [[Description]](https://adventofcode.com/2022/day/11) [[Input]](inputs/input11.txt)  
 **Answer 1:** 102399  
-**Answer 2:**   
+**Answer 2:** 23641658401  
 
