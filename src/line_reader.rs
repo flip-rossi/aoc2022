@@ -37,22 +37,26 @@ impl LineReader {
 
     /**
     Parses the `line` value as a Vec of words, where a word is
-    any sequence of characters separated by a single space.
+    any sequence of characters separated by spaces.
     */
     pub fn as_words(&self) -> Vec<String> {
         let mut words = Vec::new();
         let mut w = String::new();
 
-        // NOTE: doesn't account for repeated spaces.
         for ch in self.line.chars() {
             if ch == ' ' {
-                words.push(w);
-                w = String::new();
+                if !w.is_empty() {
+                    words.push(w);
+                    w = String::new();
+                }
             } else {
                 w.push(ch);
             }
         }
-        words.push(w);
+
+        if !w.is_empty() {
+            words.push(w);
+        }
 
         words
     }
