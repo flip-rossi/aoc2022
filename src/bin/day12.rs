@@ -1,5 +1,7 @@
 //! Day 12: Hill Climbing Algorithm
 
+use std::collections::HashMap;
+
 use aoc22::{solve_puzzle, position::Pos};
 
 const DIRECTIONS: [Pos; 4] = [
@@ -25,7 +27,7 @@ fn main() {
         let mut j = 0;
         for b in bytes {
             row.push(match b {
-                0x53 => { start = Pos::new(i,j); (0, Tag::Perm(0)) }, // 'S' in ascii. The start is 'a'
+                0x53 => { start = Pos::new(i,j); (0, Tag::Empty) }, // 'S' in ascii. The start is 'a'
                 0x45 => { end = Pos::new(i,j); (25, Tag::Empty) }, // 'E' in ascii. The end is 'z'
                 _ => (b - 0x61, Tag::Empty),
             });
@@ -40,7 +42,6 @@ fn main() {
     println!("{answer}")
 }
 
-//=============== PART 1 ===============//
 #[derive(Clone, Copy, Debug)]
 enum Tag {
     Temp(i32),
@@ -64,23 +65,53 @@ impl Tag {
         end_val
     }
 
-    fn make_perm(&mut self) {
+    fn make_perm(&mut self) -> Result<(),()> {
         if let Tag::Temp(val) = self {
-            *self = Tag::Perm(*val)
+            *self = Tag::Perm(*val);
+            Ok(())
+        }
+        else {
+            Err(())
         }
     }
 }
 
-fn dijkstras(mut terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
-    // let mut nodes: Vec<Vec<(u8,Tag)>> = terrain.iter()
-    //     .map(|i| i.iter()
-    //         .map(|j| (*j, Tag::Empty)).collect())
-    //     .collect();
+enum Goal { Ascend, Descend }
 
+fn is_valid_movement(pos: Pos, next_pos: Pos, terrain: &Vec<Vec<(u8,Tag)>>, goal: Goal) -> bool {
+    if next_pos.x < 0 || next_pos.y < 0 {
+        return false
+    }
+
+    let upos = pos.as_usize_tuple().unwrap();
+    let unext = next_pos.as_usize_tuple().unwrap();
+
+    if unext.0 >= terrain.len() || unext.1 >= terrain[unext.0].len() {
+        return false
+    }
+
+    let curr_square = &terrain[upos.0][upos.1];
+    let next_square = &terrain[unext.0][unext.1];
+
+    eprintln!("[{}][{}] {:?}", unext.0, unext.1, next_square.1);
+    if let Tag::Perm(_) = next_square.1 {
+        return false
+    }
+
+    match goal {
+        Goal::Ascend => next_square.0 <= curr_square.0 + 1,
+        Goal::Descend => next_square.0 >= curr_square.0 - 1,
+    }
+}
+
+//=============== PART 1 ===============//
+fn part1(mut terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
     let mut last_permmed: Vec<(Pos,Tag)> = Vec::new();
     let ustart = start.as_usize_tuple().unwrap();
+    terrain[ustart.0][ustart.1].1.update(0);
+    terrain[ustart.0][ustart.1].1.make_perm().unwrap();
     last_permmed.push((start, terrain[ustart.0][ustart.1].1));
-    let mut tmp_tags: std::collections::HashMap<Pos, Tag> = std::collections::HashMap::new();
+    let mut tmp_tags: HashMap<Pos, Tag> = HashMap::new();
 
     let mut iterations = 0;
 
@@ -97,7 +128,7 @@ fn dijkstras(mut terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
             };
             for dir in DIRECTIONS {
                 let next_pos = tag.0 + dir;
-                if is_valid_movement(tag.0, next_pos, &terrain) {
+                if is_valid_movement(tag.0, next_pos, &terrain, Goal::Ascend) {
                     let unext = next_pos.as_usize_tuple().unwrap();
                     terrain[unext.0][unext.1].1.update(tag_val + 1);
                     tmp_tags.insert(next_pos, terrain[unext.0][unext.1].1);
@@ -123,7 +154,7 @@ fn dijkstras(mut terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
             if let Tag::Temp(val) = tag.1 {
                 if val <= &min_val {
                     let upos = tag.0.as_usize_tuple().unwrap();
-                    terrain[upos.0][upos.1].1.make_perm();
+                    terrain[upos.0][upos.1].1.make_perm().unwrap();
                     tags_made_perm.push(*tag.0);
                     last_permmed.push((*tag.0, terrain[upos.0][upos.1].1));
                 }
@@ -139,40 +170,78 @@ fn dijkstras(mut terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
     if let Tag::Perm(shortest) = terrain[uend.0][uend.1].1 {
         shortest
     } else {
-        panic!("Dijkstra's: Couldn't find a path.")
+        panic!("Couldn't find a path.")
     }
-}
-
-fn is_valid_movement(pos: Pos, next_pos: Pos, terrain: &Vec<Vec<(u8,Tag)>>) -> bool {
-    if next_pos.x < 0 || next_pos.y < 0 {
-        return false
-    }
-
-    let upos = pos.as_usize_tuple().unwrap();
-    let unext = next_pos.as_usize_tuple().unwrap();
-
-    if unext.0 >= terrain.len() || unext.1 >= terrain[unext.0].len() {
-        return false
-    }
-
-    let curr_square = &terrain[upos.0][upos.1];
-    let next_square = &terrain[unext.0][unext.1];
-
-    eprintln!("[{}][{}] {:?}", unext.0, unext.1, next_square.1);
-    if let Tag::Perm(_) = next_square.1 {
-        return false
-    }
-
-    return next_square.0 <= curr_square.0 + 1
-}
-
-fn part1(terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> i32 {
-    dijkstras(terrain, start, end)
 }
 
 //=============== PART 2 ===============//
-#[allow(unused_variables)]
-fn part2(terrain: Vec<Vec<(u8,Tag)>>, start: Pos, end: Pos) -> ! {
-    todo!()
+/// Starts at `end` and searches for the best start
+fn part2(mut terrain: Vec<Vec<(u8,Tag)>>, _start: Pos, end: Pos) -> i32 {
+    let mut last_permmed: Vec<(Pos,Tag)> = Vec::new();
+    let uend = end.as_usize_tuple().unwrap();
+    terrain[uend.0][uend.1].1.update(0);
+    terrain[uend.0][uend.1].1.make_perm().unwrap();
+    last_permmed.push((end, terrain[uend.0][uend.1].1));
+    let mut tmp_tags: HashMap<Pos, Tag> = HashMap::new();
+
+    let mut iterations = 0;
+
+    while !last_permmed.is_empty() {
+        eprintln!("ITERATION {iterations}");
+        eprintln!("Edge tags: {}", last_permmed.len());
+
+        // Find new minimal tags
+        for tag in &last_permmed {
+            let tag_val = match tag.1 {
+                Tag::Perm(v) => v,
+                _ => panic!("Non-permanent tag in last_permmed list")
+            };
+            for dir in DIRECTIONS {
+                let next_pos = tag.0 + dir;
+                if is_valid_movement(tag.0, next_pos, &terrain, Goal::Descend) {
+                    let unext = next_pos.as_usize_tuple().unwrap();
+                    terrain[unext.0][unext.1].1.update(tag_val + 1);
+                    tmp_tags.insert(next_pos, terrain[unext.0][unext.1].1);
+                    eprintln!("{tag_val}");
+                }
+            }
+        }
+        last_permmed.clear();
+
+        // Find min-val
+        let mut min_val = i32::MAX;
+        for tag in &tmp_tags {
+            if let Tag::Temp(val) = tag.1 {
+                if val < &min_val {
+                    min_val = *val;
+                }
+            }
+        }
+
+        // Make new minimal tags be permanent
+        let mut tags_made_perm = Vec::new();
+        for tag in &tmp_tags {
+            if let Tag::Temp(val) = tag.1 {
+                if val <= &min_val {
+                    let upos = tag.0.as_usize_tuple().unwrap();
+
+                    if terrain[upos.0][upos.1].0 == 0 {
+                        return *val // GROUND REACHED
+                    }
+
+                    terrain[upos.0][upos.1].1.make_perm().unwrap();
+                    tags_made_perm.push(*tag.0);
+                    last_permmed.push((*tag.0, terrain[upos.0][upos.1].1));
+                }
+            }
+        }
+        for pos in &tags_made_perm {
+            tmp_tags.remove(pos);
+        }
+
+        iterations += 1
+    }
+
+    panic!("Couldn't find a path.")
 }
 

@@ -57,6 +57,6 @@ The answers for my puzzle inputs.
 
 ### Day 12: Hill Climbing Algorithm
 [[Description]](https://adventofcode.com/2022/day/12) [[Input]](inputs/input12.txt)  
-**Answer 1:**   
-**Answer 2:**   
+**Answer 1:** 468  
+**Answer 2:** 459  
 
