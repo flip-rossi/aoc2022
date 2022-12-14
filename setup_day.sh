@@ -1,6 +1,10 @@
 #!/bin/sh
 
-day_padded=$(TZ='EST5' date +%d)
+if [ -v 1 ]; then
+    printf -v day_padded "%02d" $1
+else
+    day_padded=$(TZ='EST5' date +%d)
+fi
 out="$(dirname $0)/inputs/input${day_padded}.txt"
 day=$((10#$day_padded))
 url="https://adventofcode.com/2022/day/${day}"
