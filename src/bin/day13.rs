@@ -4,7 +4,7 @@ use std::cmp::Ordering::{Greater, Equal, Less};
 
 use aoc22::solve_puzzle;
 
-#[derive(Eq, Ord)]
+#[derive(Clone, Eq, Ord)]
 enum Item {
     Number(i32),
     List(Vec<Item>),
@@ -106,13 +106,12 @@ impl PartialOrd for Item {
 
 fn main() {
     // Parse input
-    let mut pairs: Vec<(Item,Item)> = Vec::new();
+    let mut packets: Vec<Item> = Vec::new();
 
     let stdin = std::io::stdin();
     let mut line = String::new();
     while stdin.read_line(&mut line).unwrap() > 0 {
-        let mut packets: [Option<Item>; 2] = [None, None];
-        for i in 0..=1 {
+        for _ in 0..2 {
             let mut item_stack = Vec::new();
             let mut list_item = Item::List(Vec::new());
             let mut num_item = String::new();
@@ -152,28 +151,27 @@ fn main() {
             }
 
             eprintln!("{:?}", list_item);
-            packets[i] = Some(list_item);
+            packets.push(list_item);
             line.clear();
             stdin.read_line(&mut line).unwrap();
         }
         line.clear();
-        pairs.push( (packets[0].take().unwrap(), packets[1].take().unwrap()) );
         eprintln!();
     }
 
     // Solve
-    let answer = solve_puzzle!(pairs);
+    let answer = solve_puzzle!(packets);
     println!("{answer}")
 }
 
 
 //=============== PART 1 ===============//
-fn part1(pairs: Vec<(Item,Item)>) -> usize {
+fn part1(packets: Vec<Item>) -> usize {
     eprintln!("=============");
     let mut sum = 0;
-    for i in 0..pairs.len() {
-        if pairs[i].0 < pairs[i].1 {
-            eprintln!("PAIR {}\n{:?}\nis smaller than\n{:?}", i+1, pairs[i].0, pairs[i].1);
+    for i in 0..packets.len()/2 {
+        if packets[i*2] < packets[i*2+1] {
+            eprintln!("PAIR {}\n{:?}\nis smaller than\n{:?}", i+1, packets[i*2], packets[i*2+1]);
             sum += i+1;
         }
     }
@@ -181,8 +179,30 @@ fn part1(pairs: Vec<(Item,Item)>) -> usize {
 }
 
 //=============== PART 2 ===============//
-#[allow(unused_variables)]
-fn part2(pairs: Vec<(Item,Item)>) -> ! {
-    todo!()
+fn part2(packets: Vec<Item>) -> usize {
+    let div_packates = (
+        Item::List(vec![Item::List(vec![Item::Number(2)])]),
+        Item::List(vec![Item::List(vec![Item::Number(6)])])
+    );
+
+    let mut indexes = (1,1);
+    let mut greater_packates = Vec::with_capacity(packets.len());
+    for p in packets {
+        if div_packates.0 > p {
+            indexes.0 += 1;
+        }
+        else {
+            greater_packates.push(p.clone());
+        }
+    }
+
+    indexes.1 = indexes.0 + 1;
+    for p in greater_packates {
+        if div_packates.1 > p {
+            indexes.1 += 1;
+        }
+    }
+
+    indexes.0 * indexes.1
 }
 
