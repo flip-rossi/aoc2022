@@ -60,3 +60,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 468  
 **Answer 2:** 459  
 
+### Day 13: Distress Signal
+[[Description]](https://adventofcode.com/2022/day/13) [[Input]](inputs/input13.txt)  
+**Answer 1:**   
+**Answer 2:**   
+
