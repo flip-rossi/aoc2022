@@ -4,10 +4,18 @@ use std::cmp::Ordering::{Greater, Equal, Less};
 
 use aoc22::solve_puzzle;
 
-#[derive(Debug, Eq, Ord)]
+#[derive(Eq, Ord)]
 enum Item {
     Number(i32),
     List(Vec<Item>),
+}
+impl std::fmt::Debug for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Number(num) => f.write_fmt(format_args!("{num}")),
+            Self::List(list) => f.write_fmt(format_args!("{list:?}")),
+        }
+    }
 }
 impl Item {
     fn push_subitem(&mut self, subitem: Item) -> Result<(),()> {
@@ -16,7 +24,13 @@ impl Item {
             _ => Err(())
         }
     }
-    
+
+    fn num_as_list(&self) -> Result<Item,()> {
+        match self {
+            Item::Number(num) => Ok( Item::List(vec![Item::Number(*num)]) ),
+            _ => Err(())
+        }
+    }
 }
 impl PartialEq for Item {
     fn eq(&self, other: &Self) -> bool {
@@ -66,20 +80,22 @@ impl PartialOrd for Item {
         match self {
             Self::Number(s_num) => match other {
                 Self::Number(o_num) => s_num.partial_cmp(o_num),
-                Self::List(o_list) => Some( 
-                    if o_list.len() == 0 { Greater }
-                    else { Less } // because Equal was already checked
-                ),
+                Self::List(o_list) => {
+                    if o_list.len() == 0 { Some(Greater) }
+                    else { self.num_as_list().unwrap().partial_cmp(&other) }
+                },
             },
             Self::List(s_list) => match other {
-                Self::Number(_o_num) => Some(
-                    if s_list.len() == 0 { Less }
-                    else { Greater } // because Equal was already checked
-                ),
+                Self::Number(_o_num) => {
+                    if s_list.len() == 0 { Some(Less) }
+                    else { self.partial_cmp(&other.num_as_list().unwrap()) }
+                },
                 Self::List(o_list) => {
-                    for i in s_list {
-                        let ordering = i.partial_cmp(other);
-                        if let Some(Less|Greater) = ordering { return ordering }
+                    let min_length = s_list.len().min(o_list.len());
+                    for i in 0..min_length {
+                        let ordering = s_list[i].partial_cmp(&o_list[i]);
+                        if let Some(Less|Greater) = ordering
+                            { return ordering }
                     }
                     s_list.len().partial_cmp(&o_list.len())
                 },
@@ -131,6 +147,9 @@ fn main() {
                     },
                 }
             }
+            if !num_item.is_empty() {
+                push_num_item(&mut list_item, &mut num_item);
+            }
 
             eprintln!("{:?}", list_item);
             packets[i] = Some(list_item);
@@ -139,21 +158,31 @@ fn main() {
         }
         line.clear();
         pairs.push( (packets[0].take().unwrap(), packets[1].take().unwrap()) );
+        eprintln!();
     }
 
     // Solve
-    let answer = solve_puzzle!();
+    let answer = solve_puzzle!(pairs);
     println!("{answer}")
 }
 
 
 //=============== PART 1 ===============//
-fn part1() -> usize {
-    todo!()
+fn part1(pairs: Vec<(Item,Item)>) -> usize {
+    eprintln!("=============");
+    let mut sum = 0;
+    for i in 0..pairs.len() {
+        if pairs[i].0 < pairs[i].1 {
+            eprintln!("PAIR {}\n{:?}\nis smaller than\n{:?}", i+1, pairs[i].0, pairs[i].1);
+            sum += i+1;
+        }
+    }
+    sum
 }
 
 //=============== PART 2 ===============//
-fn part2() -> ! {
+#[allow(unused_variables)]
+fn part2(pairs: Vec<(Item,Item)>) -> ! {
     todo!()
 }
 

@@ -62,6 +62,6 @@ The answers for my puzzle inputs.
 
 ### Day 13: Distress Signal
 [[Description]](https://adventofcode.com/2022/day/13) [[Input]](inputs/input13.txt)  
-**Answer 1:**   
+**Answer 1:** 5806  
 **Answer 2:**   
 
