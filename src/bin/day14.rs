@@ -48,27 +48,23 @@ fn main() {
                     tiles.insert(Pos::new(x, re1.y));
                 }
             }
-            // eprintln!("Rock made from ({},{}) to ({},{})", re1.x, re1.y, re2.x, re2.y);
         }
 
         line.clear();
     }
 
-    for y in 0..=10 {
+    for y in 0..=168 {
         let mut line = String::with_capacity(503-494+1);
-        for x in 494..=503 {
-            if tiles.contains(&Pos::new(x, y)) {
-                line.push('#');
-            }
-            else if Pos::new(x,y) == SAND_SOURCE {
-                line.push('+');
-            }
-            else {
-                line.push('.');
-            }
+        for x in 491..=603 {
+            line.push(
+                if tiles.contains(&Pos::new(x, y)) { '#' }
+                else if Pos::new(x,y) == SAND_SOURCE { '+' }
+                else { '.' }
+            );
         }
         println!("{line}");
     }
+    println!();
 
     // Solve
     let answer = solve_puzzle!(tiles);
@@ -80,7 +76,6 @@ fn sand_fall(tiles: &mut HashSet<Pos>, mut sand: Pos) -> bool {
     let mut next_pos = sand + DOWN;
     while !tiles.contains(&next_pos) {
         sand = next_pos;
-        eprintln!("{sand:?}");
         next_pos += DOWN;
         if unsafe { sand.y >= LOWEST } {
             return false
@@ -90,28 +85,13 @@ fn sand_fall(tiles: &mut HashSet<Pos>, mut sand: Pos) -> bool {
     let old_pos = sand;
     if !tiles.contains(&(sand+DOWN_L)) {
         sand += DOWN_L;
-        eprintln!("{sand:?}");
     }
     else if !tiles.contains(&(sand+DOWN_R)) {
         sand += DOWN_R;
-        eprintln!("{sand:?}");
     }
     
     if sand == old_pos {
         tiles.insert(sand);
-        eprintln!("{sand:?}");
-        for y in 0..=10 {
-            let mut line = String::with_capacity(503-494+1);
-            for x in 494..=503 {
-                line.push(
-                    if Pos::new(x,y) == sand { 'O' }
-                    else if tiles.contains(&Pos::new(x, y)) { '#' }
-                    else if Pos::new(x,y) == SAND_SOURCE { '+' }
-                    else { '.' }
-                );
-            }
-            println!("{line}");
-        }
         true
     }
     else {
@@ -120,10 +100,25 @@ fn sand_fall(tiles: &mut HashSet<Pos>, mut sand: Pos) -> bool {
 }
 
 fn part1(mut tiles: HashSet<Pos>) -> i32 {
+    let old_tiles = tiles.clone();
+
     let mut hour_glass = 0;
     while sand_fall(&mut tiles, SAND_SOURCE) {
         hour_glass += 1;
-        eprintln!("SAND {hour_glass:?}");
+    }
+    // Print new map
+    for y in 0..=168 {
+        let mut line = String::with_capacity(503-494+1);
+        for x in 491..=603 {
+            let pos = Pos::new(x, y);
+            line.push(
+                if old_tiles.contains(&pos) { '█' }
+                else if tiles.contains(&pos) { 'O' }
+                else if pos == SAND_SOURCE { '+' }
+                else { ' ' }
+            );
+        }
+        println!("{line}");
     }
     hour_glass
 }
