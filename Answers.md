@@ -65,3 +65,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 5806  
 **Answer 2:** 23600  
 
+### Day 15: Beacon Exclusion Zone
+[[Description]](https://adventofcode.com/2022/day/15) [[Input]](inputs/input15.txt)  
+**Answer 1:** 5240818  
+**Answer 2:**   
+
