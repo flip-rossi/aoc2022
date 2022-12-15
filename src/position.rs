@@ -14,13 +14,17 @@ impl std::fmt::Display for IntConversionError {
 impl std::error::Error for IntConversionError {}
 
 //
-#[derive(Clone, Copy, Hash, PartialEq, Eq)]
+
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Pos {
     pub x: i32,
     pub y: i32
 }
 
 impl Pos {
+    /// (0, 0)
+    pub const ORIGIN: Pos = Pos { x: 0, y: 0 };
+
     pub fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
@@ -40,6 +44,11 @@ impl Pos {
         else {
             Ok((self.x as usize, self.y as usize))
         }
+    }
+
+    /// The Manhattan Distance from this position to another
+    pub fn manh_dist(&self, other: &Self) -> i32 {
+        (other.x - self.x).abs() + (other.y - self.y).abs()
     }
 }
 impl Add for Pos {
