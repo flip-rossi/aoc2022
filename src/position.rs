@@ -8,7 +8,7 @@ pub struct IntConversionError {
 }
 impl std::fmt::Display for IntConversionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.write_fmt(format_args!("Error converting {:?} to unsigned", self.convertion_attempt))
     }
 }
 impl std::error::Error for IntConversionError {}
