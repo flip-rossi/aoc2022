@@ -68,5 +68,5 @@ The answers for my puzzle inputs.
 ### Day 14: Regolith Reservoir
 [[Description]](https://adventofcode.com/2022/day/14) [[Input]](inputs/input14.txt)  
 **Answer 1:** 1330  
-**Answer 2:**   
+**Answer 2:** 26139  
 

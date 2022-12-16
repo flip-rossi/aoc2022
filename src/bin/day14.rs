@@ -9,10 +9,9 @@ const DOWN  : Pos = Pos { x:  0, y: 1 };
 const DOWN_L: Pos = Pos { x: -1, y: 1 };
 const DOWN_R: Pos = Pos { x:  1, y: 1 };
 
-static mut LOWEST: i32 = 0;
-
 fn main() {
     let mut tiles: HashSet<Pos> = HashSet::new();
+    let mut lowest = 0;
     // Parse input
     let stdin = std::io::stdin();
     let mut line = String::new();
@@ -35,10 +34,8 @@ fn main() {
                 for y in upper..=lower {
                     tiles.insert(Pos::new(re1.x, y));
                 }
-                unsafe {
-                    if lower > LOWEST {
-                        LOWEST = lower;
-                    }
+                if lower > lowest {
+                    lowest = lower;
                 }
             }
             else {
@@ -53,57 +50,57 @@ fn main() {
         line.clear();
     }
 
+    let mut graphic = String::with_capacity(169*(603-491+1)+1);
     for y in 0..=168 {
-        let mut line = String::with_capacity(503-494+1);
         for x in 491..=603 {
-            line.push(
+            graphic.push(
                 if tiles.contains(&Pos::new(x, y)) { '#' }
                 else if Pos::new(x,y) == SAND_SOURCE { '+' }
                 else { '.' }
             );
         }
-        println!("{line}");
+        graphic.push('\n')
     }
-    println!();
+    println!("{graphic}");
 
     // Solve
-    let answer = solve_puzzle!(tiles);
+    let answer = solve_puzzle!(tiles, lowest);
     println!("{answer}")
 }
 
-//=============== PART 1 ===============//
-fn sand_fall(tiles: &mut HashSet<Pos>, mut sand: Pos) -> bool {
-    let mut next_pos = sand + DOWN;
-    while !tiles.contains(&next_pos) {
-        sand = next_pos;
-        next_pos += DOWN;
-        if unsafe { sand.y >= LOWEST } {
-            return false
+fn drop_sand(tiles: &mut HashSet<Pos>, mut sand: Pos, floor: i32) -> Pos {
+    loop {
+        let mut next_pos = sand + DOWN;
+        while !tiles.contains(&next_pos) {
+            if next_pos.y >= floor {
+                tiles.insert(sand);
+                return sand
+            }
+            sand = next_pos;
+            next_pos += DOWN;
         }
-    }
 
-    let old_pos = sand;
-    if !tiles.contains(&(sand+DOWN_L)) {
-        sand += DOWN_L;
-    }
-    else if !tiles.contains(&(sand+DOWN_R)) {
-        sand += DOWN_R;
-    }
-    
-    if sand == old_pos {
-        tiles.insert(sand);
-        true
-    }
-    else {
-        sand_fall(tiles, sand)
+        let old_pos = sand;
+        if !tiles.contains(&(sand+DOWN_L)) {
+            sand += DOWN_L;
+        }
+        else if !tiles.contains(&(sand+DOWN_R)) {
+            sand += DOWN_R;
+        }
+
+        if sand == old_pos {
+            tiles.insert(sand);
+            return sand
+        }
     }
 }
 
-fn part1(mut tiles: HashSet<Pos>) -> i32 {
+//=============== PART 1 ===============//
+fn part1(mut tiles: HashSet<Pos>, lowest: i32) -> i32 {
     let old_tiles = tiles.clone();
 
     let mut hour_glass = 0;
-    while sand_fall(&mut tiles, SAND_SOURCE) {
+    while drop_sand(&mut tiles, SAND_SOURCE, lowest+1).y < lowest {
         hour_glass += 1;
     }
     // Print new map
@@ -113,7 +110,10 @@ fn part1(mut tiles: HashSet<Pos>) -> i32 {
             let pos = Pos::new(x, y);
             line.push(
                 if old_tiles.contains(&pos) { '█' }
-                else if tiles.contains(&pos) { 'O' }
+                else if tiles.contains(&pos) {
+                    if pos.y == lowest { '~' }
+                    else { 'O' }
+                }
                 else if pos == SAND_SOURCE { '+' }
                 else { ' ' }
             );
@@ -124,8 +124,31 @@ fn part1(mut tiles: HashSet<Pos>) -> i32 {
 }
 
 //=============== PART 2 ===============//
-#[allow(unused_variables)]
-fn part2(tiles: HashSet<Pos>) -> ! {
-    todo!()
+fn part2(mut tiles: HashSet<Pos>, lowest: i32) -> i32 {
+    let old_tiles = tiles.clone();
+
+    let mut hour_glass = 1;
+    while drop_sand(&mut tiles, SAND_SOURCE, lowest+2).y > 0 {
+        hour_glass += 1;
+    }
+    // Print new map
+    let mut graphic = String::with_capacity(171*(603-491+1)+1);
+    for y in 0..=170 {
+        for x in 491..=603 {
+            let pos = Pos::new(x, y);
+            graphic.push(
+                if old_tiles.contains(&pos) || pos.y >= lowest+2 { '█' }
+                else if tiles.contains(&pos) {
+                    if pos == SAND_SOURCE { '@' }
+                    else { 'o' }
+                }
+                else { ' ' }
+            );
+        }
+        graphic.push('\n')
+    }
+    print!("{graphic}");
+
+    hour_glass
 }
 
