@@ -5,10 +5,6 @@ use std::collections::{HashSet, HashMap};
 use aoc22::{ solve_puzzle, position::Pos };
 
 fn main() {
-    if std::env::args().len() < 3 {
-        aoc22::exit_msg!(1, "Usage: {} PART {{ROW_WANTED, COORDS_LIMIT}}", std::env::args().nth(0).unwrap());
-    }
-
     let mut sb_pairs: Vec<(Pos,Pos)> = Vec::new();
     // Parse input
     let stdin = std::io::stdin();
@@ -33,8 +29,10 @@ fn main() {
 
 //=============== PART 1 ===============//
 fn part1(signal_beacon_pairs: Vec<(Pos,Pos)>) -> i32 {
-    let row_wanted = std::env::args().nth(2).expect("Row wanted not specified")
-        .parse().expect("Row wanted should be an integer");
+    let row_wanted = match std::env::args().nth(2) {
+        Some(s) => s.parse().expect("Row wanted should be an integer"),
+        None => 2_000_000
+    };
 
     let mut excluded = HashSet::new();
 
@@ -59,8 +57,10 @@ fn part1(signal_beacon_pairs: Vec<(Pos,Pos)>) -> i32 {
 //=============== PART 2 ===============//
 // TODO
 fn part2(signal_beacon_pairs: Vec<(Pos,Pos)>) -> i32 {
-    let coords_lim: i32 = std::env::args().nth(2).expect("Coordenates upper limit not specified")
-        .parse().expect("Coordenates limit should be an integer");
+    let coords_lim = match std::env::args().nth(2) {
+        Some(arg) => arg.parse().expect("Coordenates limit should be an integer"),
+        None => 4_000_000
+    };
     let coords_lim_range = 0..=coords_lim;
 
     //                HashMap<row, HashSet<col>>
