@@ -62,11 +62,9 @@ fn part2(signal_beacon_pairs: Vec<(Pos,Pos)>) -> i64 {
         None => 4_000_000
     };
 
-    // let possible_template = coords_lim_range.clone().collect::<HashSet<i32>>();
-
     for row in 0..=coords_lim {
-        // eprintln!("ROW {row}");
-        let mut blocked_ranges: Vec<(i32,i32)> = Vec::new();
+        let mut possible: Vec<(i32,i32)> = Vec::new();
+        possible.push((0, coords_lim));
         for (signal, beacon) in &signal_beacon_pairs {
             let dist = signal.manh_dist(&beacon);
 
@@ -79,81 +77,43 @@ fn part2(signal_beacon_pairs: Vec<(Pos,Pos)>) -> i64 {
                 (signal.x + col_range).clamp(0, coords_lim)
             );
 
-            // eprintln!("{signal_range:?}");
+            subtract_from_ranges(&mut possible, signal_range);
 
-            let mut not_merged = true;
-            let mut i = 0;
-            while i < blocked_ranges.len() {
-                if signal_range.0-1 <= blocked_ranges[i].1 && blocked_ranges[i].0-1 <= signal_range.1 {
-                    // merge_ranges(&mut blocked_ranges, signal_range);
-                    let mut new_range = (
-                        signal_range.0.min(blocked_ranges[i].0),
-                        signal_range.1.max(blocked_ranges[i].1)
-                    );
-                    while let Some(next_r) = blocked_ranges.get(i+1) {
-                        if next_r.0-1 <= new_range.1 {
-                            new_range.0 = new_range.0.min(next_r.0);
-                            new_range.1 = new_range.1.max(next_r.1);
-                            blocked_ranges.remove(i+1);
-                            // eprintln!("merged next");
-                        }
-                        else {
-                            break
-                        }
-                    }
-                    // let mut excluded = 0;
-                    // // if i != 0 {
-                    // //     if let Some(prev_r) = blocked_ranges.get(i-1) {
-                    // //         if new_range.0-1 <= prev_r.1 {
-                    // //             new_range.0 = new_range.0.min(prev_r.0);
-                    // //             new_range.1 = new_range.1.max(prev_r.1);
-                    // //             blocked_ranges.remove(i-1);
-                    // //             excluded = 1;
-                    // //             eprintln!("merged prev");
-                    // //         }
-                    // //     }
-                    // // }
-                    // eprintln!("new range {new_range:?}");
-                    blocked_ranges[i] = new_range;
-                    not_merged = false;
-                    break
-                }
-                else if signal_range.1 < blocked_ranges[i].0-1 {
-                    blocked_ranges.insert(i, signal_range);
-                    break
-                }
-                i += 1;
-            }
-            if not_merged {
-                blocked_ranges.push(signal_range);
-            }
-            // eprintln!("{blocked_ranges:?}");
         }
-        // eprintln!("ROW {row}: {blocked_ranges:?}");
-        if blocked_ranges.len() >= 2 { // || blocked_ranges[0].0 > 0 || blocked_ranges[blocked_ranges.len()-1].1 < coords_lim {
-            eprintln!("{blocked_ranges:?} on x={}, y={row}", blocked_ranges[0].1+1);
-            return (blocked_ranges[0].1+1) as i64 * 4_000_000 + row as i64
+
+        if let Some(r) = possible.first() {
+            eprintln!("{possible:?} on x={}, y={row}", r.0);
+            return r.0 as i64 * 4_000_000 + row as i64;
         }
-        
     }
 
     panic!("empty space not found")
 }
 
-fn merge_ranges(ranges: &mut Vec<(i32,i32)>, mut signal_range: (i32,i32)) {
-    let mut to_remove = Vec::with_capacity(ranges.len());
-    for (i, r) in ranges.iter().enumerate() {
-        if signal_range.0-1 <= r.1 && r.0-1 <= signal_range.1 {
-            to_remove.push(i);
-            signal_range = (
-                signal_range.0.min(r.0),
-                signal_range.1.max(r.1)
-            );
+fn subtract_from_ranges(ranges: &mut Vec<(i32, i32)>, sub: (i32, i32)) {
+    let mut new_ranges: Vec<(i32,i32)> = Vec::new();
+    for i in 0..ranges.len() {
+        let mut r = ranges[i];
+        if !(sub.0 <= r.0 && sub.1 >= r.1) {
+            if r.0-1 <= sub.1 && r.0-1 <= sub.1 {
+                if r.0 >= sub.0 && r.1 > sub.1 {
+                    //sub from left
+                    r.0 = r.0.max(sub.1+1);
+                }
+                else if r.0 < sub.0 && r.1 <= sub.1 {
+                    //sub from right
+                    r.1 = r.1.min(sub.0-1);
+                }
+                else {
+                    //split
+                    let left_range = ( r.0, sub.0-1 );
+                    new_ranges.push(left_range);
+                    r.0 = sub.1+1;
+                }
+            }
+            new_ranges.push(r);
         }
     }
-    for &i in to_remove.iter().rev() {
-        ranges.remove(i);
-    }
-    ranges.insert(to_remove[0], signal_range);
+    *ranges = new_ranges;
 }
 
