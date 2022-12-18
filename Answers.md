@@ -75,3 +75,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 5240818  
 **Answer 2:** 13213086906101  
 
+### Day 17: Pyroclastic Flow
+[[Description]](https://adventofcode.com/2022/day/17) [[Input]](inputs/input17.txt)  
+**Answer 1:** 3184  
+**Answer 2:**   
+
