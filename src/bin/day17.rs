@@ -1,6 +1,6 @@
 //! Day 17: Pyroclastic Flow
 
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 
 use aoc22::{solve_puzzle, position::Pos};
 
@@ -132,8 +132,73 @@ fn part1(jets: Vec<i32>) -> i32 {
 }
 
 //=============== PART 2 ===============//
-#[allow(unused_variables)]
 fn part2(jets: Vec<i32>) -> ! {
+    let mut map = HashSet::new();
+    let mut max_height = 0;
+
+    // Key: (jet, shape) -- Value: Vec<(drop, max_height)>
+    let mut states: HashMap<(usize, usize), Vec<(usize, i32)>> = HashMap::new();
+
+    let (delta_drops, delta_height);
+
+    let mut drop = 0;
+    'outer: loop {
+        // eprintln!("{drop}");
+        let jet = drop % jets.len();
+        let shape = drop % SHAPES.len();
+
+        let new_rock_pos = Pos::new(2, max_height+4);
+        let mut rock = Rock::new(&SHAPES[shape], new_rock_pos);
+
+        let mut rock_top = None;
+        while let None = rock_top {
+            rock.push_sideways(jets[jet], &map);
+            rock_top = rock.fall_once(&mut map);
+        }
+        max_height = max_height.max(rock_top.unwrap());
+
+        // cycle happened if for a same height interval, with the same jet and shape, the rock formation is the same
+        // Final result is:
+        //     detection_height
+        //   + delta_height * drops_left / delta_drops
+        //   + height added by the next `drops_left % delta_drops` drops
+        match states.get_mut(&(jet, shape)) {
+            None => { states.insert((jet, shape), vec![(drop, max_height)]); },
+            Some(states) => {
+                states.push((drop, max_height));
+                for i in (0..states.len()-1).rev() {
+                    let height_diff = max_height - states[i].1;
+                    for j in (0..i).rev() {
+                        if states[i].1 - states[j].1 == height_diff
+                           && check_cycle(&map, max_height, height_diff) {
+                            delta_drops = drop - states[i].0;
+                            delta_height = height_diff;
+                            break 'outer
+                        }
+                    }
+                }
+
+            },
+        };
+
+        drop += 1
+    }
+
+    eprintln!("Drop: {drop};\nMax height {max_height};\n(delta_drops, delta_height): ({delta_drops}, {delta_height}).");
+
     todo!()
+}
+
+fn check_cycle(map: &HashSet<Pos>, max_height: i32, height_diff: i32) -> bool {
+    for y in (max_height - height_diff + 1)..=max_height {
+        for x in 0..CHAMBER_WIDTH {
+            // if x > 2 { panic!() }
+            if map.contains(&Pos{x,y}) != map.contains(&Pos{x, y: y - height_diff}) {
+                // eprintln!("diff at x={x}, y={y}");
+                return false
+            }
+        }
+    }
+    true
 }
 
