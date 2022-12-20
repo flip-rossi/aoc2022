@@ -107,12 +107,14 @@ fn print_map(map: &HashSet<Pos>, rock: &Rock) {
 }
 
 //=============== PART 1 ===============//
-fn part1(jets: Vec<i32>) -> i32 {
+const PART1_DROPS: usize = 2022;
+
+fn part1(jets: Vec<i32>) -> usize {
     let mut map = HashSet::with_capacity(2022*5);
     let mut max_height = 0;
 
     let mut j = 0;
-    for i in 0..2022 {
+    for i in 0..PART1_DROPS {
         let new_rock_pos = Pos::new(2, max_height+4);
         let mut rock = Rock::new(&SHAPES[i % SHAPES.len()], new_rock_pos);
 
@@ -128,11 +130,13 @@ fn part1(jets: Vec<i32>) -> i32 {
         max_height = max_height.max(rock_top.unwrap());
     }
     
-    max_height
+    max_height as usize
 }
 
 //=============== PART 2 ===============//
-fn part2(jets: Vec<i32>) -> ! {
+const PART2_DROPS: usize = 1_000_000_000_000;
+
+fn part2(jets: Vec<i32>) -> usize {
     let mut map = HashSet::new();
     let mut max_height = 0;
 
@@ -142,9 +146,9 @@ fn part2(jets: Vec<i32>) -> ! {
     let (delta_drops, delta_height);
 
     let mut drop = 0;
+    let mut jet = 0;
     'outer: loop {
         // eprintln!("{drop}");
-        let jet = drop % jets.len();
         let shape = drop % SHAPES.len();
 
         let new_rock_pos = Pos::new(2, max_height+4);
@@ -153,6 +157,7 @@ fn part2(jets: Vec<i32>) -> ! {
         let mut rock_top = None;
         while let None = rock_top {
             rock.push_sideways(jets[jet], &map);
+            jet = (jet+1) % jets.len();
             rock_top = rock.fall_once(&mut map);
         }
         max_height = max_height.max(rock_top.unwrap());
@@ -170,7 +175,7 @@ fn part2(jets: Vec<i32>) -> ! {
                     let height_diff = max_height - states[i].1;
                     for j in (0..i).rev() {
                         if states[i].1 - states[j].1 == height_diff
-                           && check_cycle(&map, max_height, height_diff) {
+                           && check_cycle(&map, max_height-4, height_diff) {
                             delta_drops = drop - states[i].0;
                             delta_height = height_diff;
                             break 'outer
@@ -186,15 +191,40 @@ fn part2(jets: Vec<i32>) -> ! {
 
     eprintln!("Drop: {drop};\nMax height {max_height};\n(delta_drops, delta_height): ({delta_drops}, {delta_height}).");
 
-    todo!()
+    let detection_height = max_height-4;
+    let drops_left = PART2_DROPS - drop;
+    let added_height = delta_height as usize * (drops_left / delta_drops);
+    eprintln!("added height {added_height}");
+
+    let logical_drops = drop + drops_left % delta_drops;
+    eprintln!("logical drops {logical_drops}");
+
+    drop += 1;
+    while drop < logical_drops {
+        let shape = drop % SHAPES.len();
+
+        let new_rock_pos = Pos::new(2, max_height+4);
+        let mut rock = Rock::new(&SHAPES[shape], new_rock_pos);
+
+        let mut rock_top = None;
+        while let None = rock_top {
+            rock.push_sideways(jets[jet], &map);
+            jet = (jet+1) % jets.len();
+            rock_top = rock.fall_once(&mut map);
+        }
+        max_height = max_height.max(rock_top.unwrap());
+
+        drop += 1
+    }
+    eprintln!("logical max height {max_height}");
+
+    detection_height as usize + added_height as usize + (max_height - detection_height) as usize
 }
 
-fn check_cycle(map: &HashSet<Pos>, max_height: i32, height_diff: i32) -> bool {
-    for y in (max_height - height_diff + 1)..=max_height {
+fn check_cycle(map: &HashSet<Pos>, top_height: i32, height_diff: i32) -> bool {
+    for y in (top_height - height_diff + 1)..=top_height {
         for x in 0..CHAMBER_WIDTH {
-            // if x > 2 { panic!() }
             if map.contains(&Pos{x,y}) != map.contains(&Pos{x, y: y - height_diff}) {
-                // eprintln!("diff at x={x}, y={y}");
                 return false
             }
         }
