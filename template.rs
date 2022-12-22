@@ -3,7 +3,7 @@
 fn main() {
     // Parse input
     /*
-    for line in std::io::stdin().lines() {
+    for line in std::io::stdin().lines().map(|s| s.unwrap().trim().to_string()) {
         // ...
     }
     */

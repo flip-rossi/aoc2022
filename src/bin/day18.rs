@@ -11,8 +11,8 @@ const DIRECTIONS: [(i32,i32,i32); 6] = [
 fn main() {
     let mut cubes: HashSet<(i32,i32,i32)> = HashSet::new();
     // Parse input
-    for line in std::io::stdin().lines().map(|s| s.unwrap()) {
-        let mut coords = line.trim().split(',').map(|num| num.parse().unwrap());
+    for line in std::io::stdin().lines().map(|s| s.unwrap().trim().to_string()) {
+        let mut coords = line.split(',').map(|num| num.parse().unwrap());
         let cube = ( coords.next().unwrap(), coords.next().unwrap(), coords.next().unwrap() );
         cubes.insert(cube);
     }
