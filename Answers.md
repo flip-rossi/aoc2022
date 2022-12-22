@@ -80,3 +80,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 3184  
 **Answer 2:** 1577077363915  
 
+### Day 18: Boiling Boulders
+[[Description]](https://adventofcode.com/2022/day/18) [[Input]](inputs/input18.txt)  
+**Answer 1:**   
+**Answer 2:**   
+
