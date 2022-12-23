@@ -91,3 +91,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 3542  
 **Answer 2:** 2080  
 
+### Day 19: Not Enough Minerals
+[[Description]](https://adventofcode.com/2022/day/19) [[Input]](inputs/input19.txt)  
+**Answer 1:** 1681  
+**Answer 2:**   
+
