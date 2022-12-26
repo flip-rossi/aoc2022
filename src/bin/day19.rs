@@ -1,11 +1,13 @@
 //! Day 19: Not Enough Minerals
 
+use std::{sync, thread};
+
 use aoc22::line_reader::LineReader;
 
 const TIME: i32 = 24;
 
 /// Each robot's cost is a tuple where (ore, clay, obsidian)
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Blueprint {
     ore_robot: (i32,i32,i32),
     clay_robot: (i32,i32,i32),
@@ -115,11 +117,24 @@ fn factory_collect_and_build(blueprint: &Blueprint, minutes_left: i32, mut robot
 }
 
 fn part1(blueprints: Vec<Blueprint>) -> i32 {
-    let mut quality_sum = 0;
+    let (tx, rx) = sync::mpsc::channel();
     for (i, bp) in blueprints.iter().enumerate() {
-        let most_geodes = factory_start_building(bp, TIME, (1,0,0,0), (0,0,0,0));
-        quality_sum += (i+1) as i32 * most_geodes;
-        eprintln!("{i}+1 * {most_geodes} = {}", i+1);
+        // let most_geodes = factory_start_building(bp, TIME, (1,0,0,0), (0,0,0,0));
+        // quality_sum += (i+1) as i32 * most_geodes;
+        let tx = tx.clone();
+        let bp_clone = bp.clone();
+        thread::spawn(move || {
+            let most_geodes = factory_start_building(&bp_clone, TIME, (1,0,0,0), (0,0,0,0));
+            eprintln!("Sent: {i}+1 * {most_geodes} = {}", (i+1) as i32 * most_geodes);
+            tx.send( (i as i32 + 1, most_geodes) ).unwrap();
+        });
+    }
+    drop(tx);
+
+    let mut quality_sum = 0;
+    for rval in rx {
+        quality_sum += rval.0 * rval.1;
+        eprintln!("Got: {} * {} = {} --- Total: {quality_sum}", rval.0, rval.1, rval.0 * rval.1);
     }
     quality_sum
 }
