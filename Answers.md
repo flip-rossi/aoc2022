@@ -100,5 +100,5 @@ The answers for my puzzle inputs.
 ### Day 20: Grove Positioning System
 [[Description]](https://adventofcode.com/2022/day/20) [[Input]](inputs/input20.txt)  
 **Answer 1:** 7584  
-**Answer 2:**   
+**Answer 2:** 4907679608191  
 

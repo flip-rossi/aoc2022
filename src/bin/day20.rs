@@ -71,55 +71,47 @@ const KEY: i64 = 811589153;
 
 fn part2(nums: Vec<(usize,i32)>) -> i64 {
     let nlen = nums.len();
-    let nums = nums.iter()
+    let mut nums = nums.iter()
         .map(|(i,n)| (*i, *n as i64 * KEY))
-        .collect::<Vec<_>>();
-    let mut mod_nums = nums.iter()
-        .map(|(i,n)| (*i, n % (nlen as i64 - 1)))
         .collect::<Vec<_>>();
     let mut new_indexes = (0..nlen).collect::<Vec<_>>();
 
-    eprintln!("{mod_nums:?}");
-
     for original_i in 0..new_indexes.len()*10 {
         let i = new_indexes[original_i % new_indexes.len()];
-        let n = mod_nums[i].1;
-        if n >= 0 {
-            // shift right
-            let mut prev = i;
-            let mut next = circ_right_index(i, nlen);
-            for _ in 0..n {
-                new_indexes[mod_nums[prev].0] = next;
-                new_indexes[mod_nums[next].0] = prev;
-                mod_nums.swap(prev, next);
-                prev = next;
-                next = circ_right_index(next, nlen);
+        let new_pos = (i as i64 + nums[i].1) % (nlen-1) as i64;
+        let new_ind = if new_pos < 0 {
+            (new_pos + nlen as i64 -1) as usize
+        }
+        else {
+            new_pos as usize
+        };
+        let moved_val = nums[i];
+        nums.remove(i);
+        nums.insert(new_ind, moved_val);
+        new_indexes[nums[new_ind].0] = new_ind;
+        if new_ind > i {
+            for j in i..new_ind {
+                new_indexes[nums[j].0] -= 1;
             }
-        } else {
-            // shift left
-            let mut prev = i;
-            let mut next = circ_left_index(i, nlen);
-            for _ in 0..n.abs() {
-                new_indexes[mod_nums[prev].0] = next;
-                new_indexes[mod_nums[next].0] = prev;
-                mod_nums.swap(prev, next);
-                prev = next;
-                next = circ_left_index(next, nlen);
+        }
+        else if new_ind < i {
+            for j in new_ind+1..=i {
+                new_indexes[nums[j].0] += 1;
             }
         }
     }
 
-    let zero_ind = mod_nums.iter().enumerate()
+    let zero_ind = nums.iter().enumerate()
         .find_map(|(i,n)| match n {
             (_,0) => Some(i),
             _ => None
         }).unwrap();
 
-    eprintln!("{}", nums[mod_nums[(zero_ind + 1000)%nlen].0].1);
-    eprintln!("{}", nums[mod_nums[(zero_ind + 2000)%nlen].0].1);
-    eprintln!("{}\n", nums[mod_nums[(zero_ind + 3000)%nlen].0].1);
-    nums[mod_nums[(zero_ind + 1000)%nlen].0].1 +
-    nums[mod_nums[(zero_ind + 2000)%nlen].0].1 +
-    nums[mod_nums[(zero_ind + 3000)%nlen].0].1
+    eprintln!("  {}", nums[(zero_ind + 1000)%nlen].1);
+    eprintln!("+ {}", nums[(zero_ind + 2000)%nlen].1);
+    eprintln!("+ {}\n", nums[(zero_ind + 3000)%nlen].1);
+    nums[(zero_ind + 1000)%nlen].1
+        + nums[(zero_ind + 2000)%nlen].1
+        + nums[(zero_ind + 3000)%nlen].1
 }
 
