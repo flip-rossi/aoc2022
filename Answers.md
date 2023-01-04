@@ -101,3 +101,8 @@ The answers for my puzzle inputs.
 **Answer 1:** 7584  
 **Answer 2:** 4907679608191  
 
+### Day 21: Monkey Math
+[[Description]](https://adventofcode.com/2022/day/21) [[Input]](inputs/input21.txt)  
+**Answer 1:** 80326079210554  
+**Answer 2:**   
+
