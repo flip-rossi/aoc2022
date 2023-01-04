@@ -93,8 +93,7 @@ The answers for my puzzle inputs.
 
 ### Day 19: Not Enough Minerals
 [[Description]](https://adventofcode.com/2022/day/19) [[Input]](inputs/input19.txt)  
-    // TODO  
-**Answer 1:**   
+**Answer 1:** 1681  
 **Answer 2:**   
 
 ### Day 20: Grove Positioning System
